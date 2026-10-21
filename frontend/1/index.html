@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+        <style>
+            order {
+                border: 1px solid red;
+            }
+            span {
+                border: 1px solid blue;
+            }
+            li {
+                border: 1px solid green;
+            }
+
+            label {
+                display: block;
+                margin-top: 10px;
+            }
+            textarea {
+                border: 1px solid #ccc;
+                width: 100%;
+                height: 100px;
+            }
+
+            input {
+                border: 1px solid #ccc;
+                padding: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Software Persona</h1>
+        <div>
+            This is a div element.
+            <span>This is a span element.</span>
+            <order>This is an order element.</order>
+        </div>
+        <form>
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" />
+            <br /><br />
+
+            <label for="email">Your Email:</label>
+            <input type="email" id="email" name="email" />
+            <br /><br />
+
+            <label for="message">Your Message:</label>
+            <br />
+            <textarea id="message" name="message"></textarea>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <h2>List of Items</h2>
+        <ol>
+            <li>JavaScript</li>
+            <li>HTML</li>
+            <li>CSS</li>
+        </ol>
+
+        <ul>
+            <li>React</li>
+            <li>Vue</li>
+            <li>Angular</li>
+        </ul>
+
+        <label for="food">Choose a food:</label>
+        <select id="food" name="food">
+            <option value="pizza">Pizza</option>
+            <option value="burger">Burger</option>
+            <option value="sushi">Sushi</option>
+            <option value="manti">Manti</option>
+        </select>
+    </body>
+</html>
