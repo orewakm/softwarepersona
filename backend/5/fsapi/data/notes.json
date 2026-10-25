@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "title": "Weekend plans",
+        "content": "Visit the farmers market, then take a walk by the water."
+    },
+    {
+        "id": 2,
+        "title": "Book notes",
+        "content": "The best ideas from the chapter were about patience and practice."
+    },
+    {
+        "id": 3,
+        "title": "Grocery list",
+        "content": "Tomatoes, rice, coffee, lemons, and fresh basil."
+    },
+    {
+        "id": 4,
+        "title": "Project idea",
+        "content": "Build a simple page to track daily habits and small wins."
+    },
+    {
+        "id": 5,
+        "title": "Things to remember",
+        "content": "Charge the headphones and bring the library card tomorrow."
+    },
+    {
+        "id": 6,
+        "title": "Recipe to try",
+        "content": "Make roasted vegetable pasta with garlic and parmesan."
+    },
+    {
+        "id": 7,
+        "title": "Meeting follow-up",
+        "content": "Share the draft, confirm the timeline, and collect feedback."
+    },
+    {
+        "id": 8,
+        "title": "Travel wishlist",
+        "content": "Spend a few days exploring old streets and local cafés."
+    },
+    {
+        "id": 9,
+        "title": "Quick reminder",
+        "content": "Water the plants before leaving for the weekend."
+    },
+    {
+        "id": 10,
+        "title": "Learning goal",
+        "content": "Practice JavaScript for thirty minutes each weekday."
+    },
+    {
+        "id": 1792174304361,
+        "title": "New Note",
+        "content": "New note"
+    },
+    {
+        "id": 1792174983108,
+        "title": "POST request test",
+        "content": "Created through the notes API."
+    }
+]
