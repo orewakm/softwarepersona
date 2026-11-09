@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Study Tracker</title>
+        <style>
+            :root {
+                --text: #f8fafc;
+                --muted: #cbdaf5;
+                --label: #e0edff;
+                --card: rgba(8, 18, 53, 0.72);
+                --border: rgba(191, 219, 254, 0.22);
+                --input-bg: rgba(255, 255, 255, 0.08);
+                --input-border: rgba(219, 234, 254, 0.28);
+                --accent: #7dd3fc;
+                --danger: #fca5a5;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                font-family: Arial, sans-serif;
+                color: var(--text);
+                background: linear-gradient(110deg, #0b1535 0%, #1d4ed8 100%);
+                background-attachment: fixed;
+            }
+
+            .container {
+                width: min(1100px, 100% - 32px);
+                margin: 0 auto;
+                padding: 40px 0;
+            }
+
+            /* ===== HEADER ===== */
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-bottom: 28px;
+            }
+
+            .header h1 {
+                margin: 0 0 6px;
+            }
+
+            .header p {
+                margin: 0;
+                color: var(--muted);
+            }
+
+            /* ===== CARDS ===== */
+
+            .card {
+                padding: 20px;
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                -webkit-backdrop-filter: blur(16px);
+                backdrop-filter: blur(16px);
+            }
+
+            .card-title {
+                margin: 0 0 16px;
+                font-size: 18px;
+            }
+
+            .stats {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+
+            .stat-label {
+                color: var(--muted);
+                font-size: 14px;
+            }
+
+            .stat-value {
+                margin-top: 8px;
+                font-size: 28px;
+                font-weight: 700;
+            }
+
+            .content {
+                display: grid;
+                /* minmax(0, ...) lets the columns shrink smaller than their content */
+                grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+                gap: 16px;
+                align-items: start;
+            }
+
+            /* ===== TABLE ===== */
+
+            .table-wrapper {
+                overflow-x: auto;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th,
+            td {
+                padding: 12px;
+                text-align: left;
+                border-bottom: 1px solid var(--border);
+                white-space: nowrap;
+            }
+
+            th {
+                color: var(--muted);
+                font-size: 13px;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+            }
+
+            tbody tr:last-child td {
+                border-bottom: 0;
+            }
+
+            .actions {
+                text-align: right;
+            }
+
+            .empty {
+                padding: 32px 12px;
+                text-align: center;
+                color: var(--muted);
+                white-space: normal;
+            }
+
+            .tag {
+                padding: 4px 10px;
+                color: var(--accent);
+                background: rgba(125, 211, 252, 0.14);
+                border-radius: 999px;
+                font-size: 13px;
+            }
+
+            /* ===== SUBJECT BARS ===== */
+
+            .subject-row {
+                margin-bottom: 16px;
+            }
+
+            .subject-row:last-child {
+                margin-bottom: 0;
+            }
+
+            .subject-row-top {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 6px;
+                font-size: 14px;
+            }
+
+            .subject-row-top span:last-child {
+                color: var(--muted);
+            }
+
+            .bar {
+                height: 8px;
+                overflow: hidden;
+                background: rgba(255, 255, 255, 0.08);
+                border-radius: 999px;
+            }
+
+            .bar-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #0ea5e9, #4f46e5);
+                border-radius: 999px;
+                transition: width 300ms ease;
+            }
+
+            /* ===== BUTTONS ===== */
+
+            .btn {
+                padding: 10px 18px;
+                color: #ffffff;
+                background: linear-gradient(135deg, #0ea5e9, #4f46e5);
+                border: 0;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 14px;
+                font-weight: 700;
+                box-shadow: 0 8px 18px rgba(14, 165, 233, 0.24);
+                transition: transform 160ms ease, box-shadow 160ms ease;
+            }
+
+            .btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 22px rgba(14, 165, 233, 0.34);
+            }
+
+            .btn.secondary {
+                background: transparent;
+                border: 1px solid var(--input-border);
+                box-shadow: none;
+            }
+
+            .btn.secondary:hover {
+                background: rgba(255, 255, 255, 0.08);
+            }
+
+            .link-btn {
+                padding: 4px 8px;
+                color: var(--accent);
+                background: none;
+                border: 0;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+            .link-btn:hover {
+                text-decoration: underline;
+            }
+
+            .link-btn.danger {
+                color: var(--danger);
+            }
+
+            .btn:focus-visible,
+            .link-btn:focus-visible {
+                outline: 2px solid var(--accent);
+                outline-offset: 2px;
+            }
+
+            /* ===== MODAL ===== */
+
+            .modal {
+                position: fixed;
+                inset: 0;
+                z-index: 10;
+                display: none;
+                place-items: center;
+                padding: 16px;
+                background: rgba(3, 7, 25, 0.6);
+            }
+
+            .modal.active {
+                display: grid;
+            }
+
+            .modal-content {
+                width: min(420px, 100%);
+                padding: 28px;
+                background: #0f1d4a;
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                box-shadow: 0 24px 70px rgba(3, 7, 25, 0.5);
+            }
+
+            .modal-content h2 {
+                margin: 0 0 8px;
+            }
+
+            .modal-content label {
+                display: block;
+                margin: 16px 0 6px;
+                color: var(--label);
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+            .modal-content input,
+            .modal-content select {
+                width: 100%;
+                padding: 12px;
+                color: var(--text);
+                background: var(--input-bg);
+                border: 1px solid var(--input-border);
+                border-radius: 10px;
+                outline: none;
+                font-size: 14px;
+                color-scheme: dark;
+                transition: border-color 160ms ease, box-shadow 160ms ease;
+            }
+
+            .modal-content input:focus,
+            .modal-content select:focus {
+                border-color: var(--accent);
+                box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.18);
+            }
+
+            .modal-content select option {
+                background: #0f1d4a;
+            }
+
+            .modal-buttons {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 24px;
+            }
+
+            @media (max-width: 800px) {
+                .container {
+                    padding: 24px 0;
+                }
+
+                .content {
+                    grid-template-columns: minmax(0, 1fr);
+                }
+            }
+
+            /* On phones, 4 table columns don't fit, so each row becomes a 2-line block:
+               date | subject
+               duration | buttons */
+            @media (max-width: 600px) {
+                .card {
+                    padding: 16px;
+                }
+
+                thead {
+                    display: none;
+                }
+
+                tbody tr {
+                    display: grid;
+                    grid-template-columns: 1fr auto;
+                    align-items: center;
+                    gap: 8px;
+                    padding: 12px 0;
+                    border-bottom: 1px solid var(--border);
+                }
+
+                tbody tr:last-child {
+                    border-bottom: 0;
+                }
+
+                td {
+                    padding: 0;
+                    border-bottom: 0;
+                }
+
+                td:nth-child(2) {
+                    text-align: right;
+                }
+
+                .empty {
+                    grid-column: 1 / -1;
+                    padding: 24px 0;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <header class="header">
+                <div>
+                    <h1>Study Tracker</h1>
+                    <p>Log what you study and keep an eye on your progress.</p>
+                </div>
+                <button class="btn" onclick="openModal()">+ Add Study</button>
+            </header>
+
+            <section class="stats">
+                <div class="card">
+                    <div class="stat-label">Total study time</div>
+                    <div class="stat-value" id="statTotal">0m</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Sessions</div>
+                    <div class="stat-value" id="statSessions">0</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Last 7 days</div>
+                    <div class="stat-value" id="statWeek">0m</div>
+                </div>
+                <div class="card">
+                    <div class="stat-label">Top subject</div>
+                    <div class="stat-value" id="statTop">-</div>
+                </div>
+            </section>
+
+            <section class="content">
+                <div class="card">
+                    <h2 class="card-title">Study Sessions</h2>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Subject</th>
+                                    <th>Duration</th>
+                                    <th class="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studyList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">By Subject</h2>
+                    <div id="subjectStats"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal" id="modal">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+                <h2 id="modalTitle">Add Study</h2>
+
+                <form onsubmit="saveStudy(event)">
+                    <!-- empty = adding a new study, has an id = editing that study -->
+                    <input type="hidden" id="editId" />
+
+                    <label for="inputDate">Date</label>
+                    <input type="date" id="inputDate" required />
+
+                    <label for="inputDuration">Duration (minutes)</label>
+                    <input
+                        type="number"
+                        id="inputDuration"
+                        min="1"
+                        max="1440"
+                        placeholder="e.g. 45"
+                        required
+                    />
+
+                    <label for="inputSubject">Subject</label>
+                    <select id="inputSubject"></select>
+
+                    <div class="modal-buttons">
+                        <button type="button" class="btn secondary" onclick="closeModal()">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const SUBJECTS = ['Mathematics', 'Physics', 'Software'];
+            const STORAGE_KEY = 'studies'; // one constant, so reading and saving always use the same key
+
+            // ===== LOCAL STORAGE =====
+
+            // Read studies from localStorage
+            function getStudies() {
+                try {
+                    const data = localStorage.getItem(STORAGE_KEY);
+                    return data ? JSON.parse(data) : [];
+                } catch (err) {
+                    console.error('Could not read studies:', err);
+                    return [];
+                }
+            }
+
+            // Save studies to localStorage
+            function saveStudies(studies) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(studies));
+            }
+
+            // ===== HELPERS =====
+
+            // Date -> 'YYYY-MM-DD' in local time.
+            // (toISOString() uses UTC, so in Turkey it gives yesterday's date between 00:00 and 03:00)
+            function toDateString(date) {
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${date.getFullYear()}-${month}-${day}`;
+            }
+
+            // '2026-11-10' -> '10 Nov 2026'
+            function formatDate(dateString) {
+                const [year, month, day] = dateString.split('-').map(Number);
+                return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                });
+            }
+
+            // 90 -> '1h 30m'
+            function formatDuration(minutes) {
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                if (hours === 0) return `${mins}m`;
+                if (mins === 0) return `${hours}h`;
+                return `${hours}h ${mins}m`;
+            }
+
+            // { Mathematics: 120, Physics: 45, Software: 0 }
+            function getSubjectTotals(studies) {
+                const totals = {};
+                SUBJECTS.forEach((subject) => (totals[subject] = 0));
+                studies.forEach((study) => {
+                    totals[study.subject] = (totals[study.subject] || 0) + study.duration;
+                });
+                return totals;
+            }
+
+            // ===== MODAL =====
+
+            function openModal() {
+                document.getElementById('modalTitle').textContent = 'Add Study';
+                document.getElementById('editId').value = '';
+                document.getElementById('inputDate').value = toDateString(new Date()); // today by default
+                document.getElementById('inputDuration').value = '';
+                document.getElementById('inputSubject').value = 'Mathematics';
+                showModal();
+            }
+
+            function showModal() {
+                document.getElementById('modal').classList.add('active');
+                document.getElementById('inputDuration').focus();
+            }
+
+            function closeModal() {
+                document.getElementById('modal').classList.remove('active');
+            }
+
+            // Close when clicking the dark background or pressing Escape
+            document.getElementById('modal').addEventListener('click', (e) => {
+                if (e.target.id === 'modal') closeModal();
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // ===== RECORDS (CRUD) =====
+
+            // Create or update, depending on whether editId has a value
+            function saveStudy(event) {
+                event.preventDefault(); // stop the form from reloading the page
+
+                const editId = document.getElementById('editId').value;
+                const study = {
+                    date: document.getElementById('inputDate').value,
+                    duration: Number(document.getElementById('inputDuration').value),
+                    subject: document.getElementById('inputSubject').value,
+                };
+
+                if (!study.date || !Number.isInteger(study.duration) || study.duration <= 0) {
+                    alert('Please enter a date and a duration in whole minutes.');
+                    return;
+                }
+
+                let studies = getStudies();
+
+                if (editId) {
+                    // editId comes from an input, so it's a string. Convert it before comparing.
+                    studies = studies.map((s) => (s.id === Number(editId) ? { ...s, ...study } : s));
+                } else {
+                    studies.push({ id: Date.now(), ...study });
+                }
+
+                saveStudies(studies);
+                closeModal();
+                render();
+            }
+
+            // Fill the modal with an existing study and open it
+            function editStudy(id) {
+                const study = getStudies().find((s) => s.id === id);
+                if (!study) return;
+
+                document.getElementById('modalTitle').textContent = 'Edit Study';
+                document.getElementById('editId').value = study.id;
+                document.getElementById('inputDate').value = study.date;
+                document.getElementById('inputDuration').value = study.duration;
+                document.getElementById('inputSubject').value = study.subject;
+                showModal();
+            }
+
+            function deleteStudy(id) {
+                if (!confirm('Delete this study session?')) return;
+
+                const studies = getStudies().filter((s) => s.id !== id);
+                saveStudies(studies);
+                render();
+            }
+
+            // ===== RENDER =====
+
+            function render() {
+                const studies = getStudies();
+                renderStats(studies);
+                renderStudyList(studies);
+                renderSubjectStats(studies);
+            }
+
+            function renderStats(studies) {
+                const total = studies.reduce((sum, s) => sum + s.duration, 0);
+
+                // today plus the 6 days before it
+                const today = toDateString(new Date());
+                const weekAgo = new Date();
+                weekAgo.setDate(weekAgo.getDate() - 6);
+                const weekStart = toDateString(weekAgo);
+
+                // 'YYYY-MM-DD' strings sort like dates, so >= and <= work on them
+                const weekTotal = studies
+                    .filter((s) => s.date >= weekStart && s.date <= today)
+                    .reduce((sum, s) => sum + s.duration, 0);
+
+                const [topSubject] = Object.entries(getSubjectTotals(studies)).sort(
+                    (a, b) => b[1] - a[1]
+                )[0];
+
+                document.getElementById('statTotal').textContent = formatDuration(total);
+                document.getElementById('statSessions').textContent = studies.length;
+                document.getElementById('statWeek').textContent = formatDuration(weekTotal);
+                document.getElementById('statTop').textContent = total > 0 ? topSubject : '-';
+            }
+
+            function renderStudyList(studies) {
+                const list = document.getElementById('studyList');
+
+                if (studies.length === 0) {
+                    list.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="empty">
+                                No study sessions yet. Click "+ Add Study" to log your first one.
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                // newest date first
+                const sorted = studies.toSorted(
+                    (a, b) => b.date.localeCompare(a.date) || b.id - a.id
+                );
+
+                list.innerHTML = sorted
+                    .map(
+                        (s) => `
+                        <tr>
+                            <td>${formatDate(s.date)}</td>
+                            <td><span class="tag">${s.subject}</span></td>
+                            <td>${formatDuration(s.duration)}</td>
+                            <td class="actions">
+                                <button class="link-btn" onclick="editStudy(${s.id})">Edit</button>
+                                <button class="link-btn danger" onclick="deleteStudy(${s.id})">Delete</button>
+                            </td>
+                        </tr>`
+                    )
+                    .join('');
+            }
+
+            function renderSubjectStats(studies) {
+                const totals = getSubjectTotals(studies);
+                const total = studies.reduce((sum, s) => sum + s.duration, 0);
+
+                document.getElementById('subjectStats').innerHTML = SUBJECTS.map((subject) => {
+                    const minutes = totals[subject];
+                    const percent = total > 0 ? Math.round((minutes / total) * 100) : 0;
+
+                    return `
+                        <div class="subject-row">
+                            <div class="subject-row-top">
+                                <span>${subject}</span>
+                                <span>${formatDuration(minutes)} · ${percent}%</span>
+                            </div>
+                            <div class="bar">
+                                <div class="bar-fill" style="width: ${percent}%"></div>
+                            </div>
+                        </div>`;
+                }).join('');
+            }
+
+            // ===== START =====
+
+            // Fill the subject dropdown from the SUBJECTS list
+            const subjectSelect = document.getElementById('inputSubject');
+            SUBJECTS.forEach((subject) => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+
+            render();
+        </script>
+    </body>
+</html>
